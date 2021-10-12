@@ -573,7 +573,7 @@ class PFSenseModule(object):
 
     def phpshell(self, command):
         """ Run a command in the php developer shell """
-        command = "global $debug;\n$debug = 1;\n" + command + "\nexec\nexit"
+        command = "global $debug;\n$debug = 1;\nrequire_once('util.inc');\n" + command + "\ncarp_sync_client();\nexec\nexit"
         # Dummy argument suppresses displaying help message
         return self.module.run_command('/usr/local/sbin/pfSsh.php dummy', data=command)
 
