@@ -250,12 +250,12 @@ class PFSenseModule(object):
                         if isinstance(item, dict):
                             self.copy_dict_to_element(item, new_elt, sub=sub+1)
                         else:
-                            new_elt.text = item
+                            new_elt.text = str(item)
                         top_elt.append(new_elt)
                 else:
                     # Create a new element
                     new_elt = ET.Element(key)
-                    new_elt.text = value
+                    new_elt.text = str(value)
                     new_elt.tail = '\n%s' % ('\t' * (sub + 3))
                     top_elt.append(new_elt)
                 self.debug.write('changed=%s added key=%s value=%s tag=%s\n' % (changed, key, value, top_elt.tag))
@@ -285,14 +285,14 @@ class PFSenseModule(object):
                             if all_sub_elts[idx].text is None and item == '':
                                 pass
                             elif all_sub_elts[idx].text != item:
-                                all_sub_elts[idx].text = item
+                                all_sub_elts[idx].text = str(item)
                                 changed = True
                         elif self.copy_dict_to_element(item, all_sub_elts[idx], sub=sub + 1):
                             changed = True
                 elif this_elt.text is None and value == '':
                     pass
                 elif this_elt.text != value:
-                    this_elt.text = value
+                    this_elt.text = str(value)
                     changed = True
                 self.debug.write('changed=%s this_elt.text=%s value=%s\n' % (changed, this_elt.text, value))
         # Sub-elements must be completely described, so remove any missing elements
