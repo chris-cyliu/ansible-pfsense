@@ -140,3 +140,36 @@ def parse_interface(self, interface, fail=True, with_virtual=True):
     if fail:
         self.module.fail_json(msg='%s is not a valid interface' % (interface))
     return None
+
+def get_ports(self):
+    get_interface_cmd = (
+            'require_once("/etc/inc/interfaces.inc");'
+            '$portlist = get_interface_list();'
+            '$lagglist = get_lagg_interface_list();'
+            '$portlist = array_merge($portlist, $lagglist);'
+            'foreach ($lagglist as $laggif => $lagg) {'
+            "    $laggmembers = explode(',', $lagg['members']);"
+            '    foreach ($laggmembers as $lagm)'
+            '        if (isset($portlist[$lagm]))'
+            '            unset($portlist[$lagm]);'
+            '}')
+
+    if self.is_at_least_2_5_0():
+        get_interface_cmd += (
+            '$list = array();'
+            'foreach ($portlist as $ifn => $ifinfo) {'
+            '  $list[$ifn] = $ifn . " (" . $ifinfo["mac"] . ")";'
+            '  $iface = convert_real_interface_to_friendly_interface_name($ifn);'
+            '  if (isset($iface) && strlen($iface) > 0)'
+            '    $list[$ifn] .= " - $iface";'
+            '}'
+            'echo json_encode($list);')
+    else:
+        get_interface_cmd += (
+            '$list = array();'
+            'foreach ($portlist as $ifn => $ifinfo)'
+            '   if (is_jumbo_capable($ifn))'
+            '       array_push($list, $ifn);'
+            'echo json_encode($list);')
+
+    return self.php(get_interface_cmd)
