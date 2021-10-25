@@ -31,7 +31,8 @@ CERT_ARGUMENT_SPEC = dict(
     descr=dict(required=True, type='str'),
     type=dict(default='server', type='str'),
     crt=dict(required=True, type='str'),
-    prv=dict(required=True, type='str')
+    prv=dict(required=True, type='str'),
+    ca_descr=dict(default=None, type='str')
 )
 
 class PFSenseCertModule(PFSenseModuleBase):
@@ -64,6 +65,9 @@ class PFSenseCertModule(PFSenseModuleBase):
             lines = prv.splitlines()
             if not(lines[0] == '-----BEGIN PRIVATE KEY-----' and lines[-1] == '-----END PRIVATE KEY-----'):
                 self.module.fail_json(msg='Could not recognize private key format: %s' % (prv))
+            
+            if self.params["ca_descr"] and not self.pfsense.find_ca_elt(self.params["ca_descr"]):
+                self.module.fail_json(msg=f'Could not find CA with descr, {self.params["ca_descr"]}')
 
 
     def _params_to_obj(self):
@@ -78,6 +82,8 @@ class PFSenseCertModule(PFSenseModuleBase):
             self._get_ansible_param(obj, 'type')
             obj["crt"] = base64.b64encode(bytes(params['crt'],'utf-8')).decode()
             obj["prv"] = base64.b64encode(bytes(params['prv'],'utf-8')).decode()
+            if self.params["ca_descr"]:
+                obj["caref"] = self.pfsense.find_ca_elt(self.params["ca_descr"]).find("refid").text
 
         return obj
 
