@@ -7,13 +7,20 @@
 from __future__ import (absolute_import, division, print_function)
 __metaclass__ = type
 
-
-def get_interface_by_display_name(self, name):
+def get_interface_elt_by_display_name(self, name):
     """ return interface_id by name """
     for interface in self.interfaces:
         descr_elt = interface.find('descr')
-        if descr_elt is not None and descr_elt.text.strip().lower() == name.lower():
-            return interface.tag
+        if (descr_elt is not None and descr_elt.text.strip().lower() == name.lower()) or (descr_elt is None and interface.tag.lower() == name.lower()):
+            return interface
+    return None
+
+def get_interface_by_display_name(self, name):
+    """ return interface_id by name """
+    interface_elt = self.get_interface_elt_by_display_name(name)
+    if interface_elt:
+        return interface_elt.tag
+
     return None
 
 
@@ -64,10 +71,9 @@ def get_interface_port(self, interface_id):
 
 def get_interface_port_by_display_name(self, name):
     """ return interface port """
-    for interface in self.interfaces:
-        descr_elt = interface.find('descr')
-        if descr_elt is not None and descr_elt.text.strip().lower() == name.lower():
-            return interface.find('if').text.strip()
+    interface_elt = self.get_interface_elt_by_display_name(name)
+    if interface_elt:
+        return interface_elt.find('if').text.strip()
     return None
 
 
@@ -103,11 +109,9 @@ def is_interface_port(self, interface_port):
 
 def is_interface_display_name(self, name):
     """ determines if arg is an interface name or not """
-    for interface in self.interfaces:
-        descr_elt = interface.find('descr')
-        if descr_elt is not None:
-            if descr_elt.text.strip().lower() == name.lower():
-                return True
+    interface_elt = self.get_interface_elt_by_display_name(name)
+    if interface_elt:
+        return True
     return False
 
 

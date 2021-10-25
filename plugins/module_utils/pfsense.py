@@ -27,6 +27,7 @@ class PFSenseModule(object):
     from ansible_collections.pfsensible.core.plugins.module_utils.__impl.interfaces import (
         get_interface_display_name,
         get_interface_elt,
+        get_interface_elt_by_display_name,
         get_interface_port,
         get_interface_port_by_display_name,
         get_interface_by_display_name,
