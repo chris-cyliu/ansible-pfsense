@@ -216,17 +216,17 @@ class PFSenseAuthserverLDAPModule(PFSenseModuleBase):
 
     def _create_target(self):
         """ create the XML target_elt """
-        return self.pfsense.new_element('user')
+        target_elt = self.pfsense.new_element('authserver')
+        self.root_elt.append(target_elt)
+  
+        return target_elt
 
     def _copy_and_add_target(self):
         """ populate the XML target_elt """
         obj = self.obj
-
-        self.target_elt = self.pfsense.new_element('authserver')
         obj['refid'] = self.pfsense.uniqid()
         self.pfsense.copy_dict_to_element(obj, self.target_elt)
         self.diff['after'] = obj
-        self.root_elt.insert(self._find_last_index(), self.target_elt)
 
     def _copy_and_update_target(self):
         """ update the XML target_elt """
