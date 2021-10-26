@@ -307,9 +307,14 @@ echo json_encode(array('vpnid'=>openvpn_vpnid_next()));
 require_once("openvpn.inc");
 require_once("pfsense-utils.inc");
 require_once("pkg-utils.inc");
+
+init_config_arr(array('openvpn', 'openvpn-server'));
+$a_server = &$config['openvpn']['openvpn-server'];
+
 '''+
 cleanup_stat+
-'''
+f'''
+$server = $a_server[{self.id}];
 openvpn_resync('server', $server);
 openvpn_resync_csc_all();
 ''')
