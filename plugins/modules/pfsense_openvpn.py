@@ -71,6 +71,11 @@ OPENVPN_ARGUMENT_SPEC = dict(
     ping_action_seconds=dict(default=60, type='int'),
     ping_action_push=dict(default=False, type='bool'),
     inactive_seconds=dict(default=0, type='int'),
+    dns_domain=dict(default='', type='str'),
+    dns_server1=dict(default='', type='str'),
+    dns_server2=dict(default='', type='str'),
+    dns_server3=dict(default='', type='str'),
+    dns_server4=dict(default='', type='str'),
 )
 
 
@@ -169,6 +174,11 @@ class PFSenseOpenVpnModule(PFSenseModuleBase):
             self._get_ansible_param(obj, "ping_action_seconds")
             self._get_ansible_param_bool(obj, "ping_action_push")
             self._get_ansible_param(obj, "inactive_seconds")
+            self._get_ansible_param(obj, "dns_domain")
+            self._get_ansible_param(obj, "dns_server1")
+            self._get_ansible_param(obj, "dns_server2")
+            self._get_ansible_param(obj, "dns_server3")
+            self._get_ansible_param(obj, "dns_server4")
 
         else:
             obj["disable"] = ""
