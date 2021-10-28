@@ -111,7 +111,10 @@ class PFSenseCAModule(PFSenseModuleBase):
                 params['crl'] = base64.b64encode(crl.encode()).decode()
             elif not re.match('LS0tLS1CRUdJTiBYNTA5IENSTC0tLS0t', crl):
                 self.module.fail_json(msg='Could not recognize CRL format: %s' % (crl))
-
+        
+        if params['prv'] is not None:
+            params['prv'] = base64.b64encode(params['prv'].encode()).decode()
+            
     def _params_to_obj(self):
         """ return a dict from module params """
         params = self.params
@@ -125,6 +128,8 @@ class PFSenseCAModule(PFSenseModuleBase):
                 obj['crt'] = params['certificate']
             if 'crl' in params and params['crl'] is not None:
                 obj['crl'] = params['crl']
+            
+            obj['prv'] = params['prv']
 
         return obj
 
@@ -286,6 +291,7 @@ def main():
             },
             'certificate': {'type': 'str'},
             'crl': {'default': None, 'type': 'str'},
+            'prv': {'default': None, 'type': 'str'}
         },
         required_if=[
             ["state", "present", ["certificate"]],
