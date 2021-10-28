@@ -7,6 +7,7 @@
 # TODO: alias for DNS record
 
 from __future__ import absolute_import, division, print_function
+import base64
 import copy
 __metaclass__ = type
 from ansible_collections.pfsensible.core.plugins.module_utils.module_base import PFSenseModuleBase
@@ -101,7 +102,7 @@ class PFSenseDNSModule(PFSenseModuleBase):
             obj["enable"] = ""
             obj["active_interface"] = ",".join(self.get_interface_by_display_name(x) for x in params["list_active_interface_descr"])
             obj["outgoing_interface"] = ",".join(self.get_interface_by_display_name(x) for x in params["list_outgoing_interface_descr"])
-            self._get_ansible_param_bool(obj, "custom_options", value="")
+            obj["custom_options"] = base64.b64encode(bytes(params['custom_options'],'utf-8')).decode()
             self._get_ansible_param_bool(obj, "hideidentity", value="")
             self._get_ansible_param_bool(obj, "hideversion", value="")
             self._get_ansible_param_bool(obj, "dnssecstripped", value="")
