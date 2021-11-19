@@ -37,6 +37,7 @@ class PFSenseModule(object):
         is_interface_group,
         is_interface_port,
         parse_interface,
+        get_ports,
     )
     from ansible_collections.pfsensible.core.plugins.module_utils.__impl.addresses import (
         is_ipv4_address,
