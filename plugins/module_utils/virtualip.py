@@ -44,6 +44,9 @@ class PFSenseVirtualipModule(PFSenseModuleBase):
         self.obj = dict()
 
         self.root_elt = self.pfsense.virtualip
+        if self.root_elt is None:
+            self.root_elt = self.pfsense.new_element("virtualip")
+            self.pfsense.root.append(self.root_elt)
         self.target_idx = None
         self.is_delete = False
 
