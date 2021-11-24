@@ -19,6 +19,7 @@ LAGG_ARGUMENT_SPEC = dict(
     descr=dict(requried=True, type='str'),
     proto=dict(requried=True, choices=["none", "lacp", "failover", "loadbalance", "roundrobin"]),
     lacptimeout=dict(default='slow', choices=['slow', 'fast']),
+    laggif=dict(required=True, type='str'),
 )
 
 class PFSenselaggModule(PFSenseModuleBase):
@@ -48,6 +49,7 @@ class PFSenselaggModule(PFSenseModuleBase):
             obj["members"] = ",".join(params["members"])
             self._get_ansible_param(obj,'descr')
             self._get_ansible_param(obj,'proto')
+            self._get_ansible_param(obj,'laggif')
         return obj
 
     def _validate_params(self):
@@ -71,7 +73,7 @@ class PFSenselaggModule(PFSenseModuleBase):
         
         target_elt=None
         for idx, elt in enumerate(lagg_elt.findall("lagg")):
-            if obj["descr"] == elt.find("descr").text:
+            if self.params["laggif"] == elt.find("laggif").text:
                 target_elt = elt
                 self.id = idx
         
