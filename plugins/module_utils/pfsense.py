@@ -52,23 +52,30 @@ class PFSenseModule(object):
     )
     from ansible_collections.pfsensible.core.plugins.module_utils.__impl.checks import check_name, check_ip_address
 
+    def _find_or_create_element_in_root(self, name):
+        ret = self.get_element(name)
+        if ret is None:
+            ret = self.new_element(name)
+            self.root.append(ret)
+        return ret
+        
     def __init__(self, module, config='/cf/conf/config.xml'):
         self.module = module
         self.config = config
         self.tree = ET.parse(config)
         self.root = self.tree.getroot()
         self.config_version = float(self.get_element('version').text)
-        self.aliases = self.get_element('aliases')
-        self.interfaces = self.get_element('interfaces')
-        self.ifgroups = self.get_element('ifgroups')
-        self.rules = self.get_element('filter')
-        self.shapers = self.get_element('shaper')
-        self.dnshapers = self.get_element('dnshaper')
-        self.vlans = self.get_element('vlans')
-        self.gateways = self.get_element('gateways')
-        self.ipsec = self.get_element('ipsec')
-        self.openvpn = self.get_element('openvpn')
-        self.virtualip = self.get_element('virtualip')
+        self.aliases = self._find_or_create_element_in_root('aliases')
+        self.interfaces = self._find_or_create_element_in_root('interfaces')
+        self.ifgroups = self._find_or_create_element_in_root('ifgroups')
+        self.rules = self._find_or_create_element_in_root('filter')
+        self.shapers = self._find_or_create_element_in_root('shaper')
+        self.dnshapers = self._find_or_create_element_in_root('dnshaper')
+        self.vlans = self._find_or_create_element_in_root('vlans')
+        self.gateways = self._find_or_create_element_in_root('gateways')
+        self.ipsec = self._find_or_create_element_in_root('ipsec')
+        self.openvpn = self._find_or_create_element_in_root('openvpn')
+        self.virtualip = self._find_or_create_element_in_root('virtualip')
         self.debug = open('/tmp/pfsense.debug', 'w')
         if sys.version_info >= (3, 4):
             self._scrub()
