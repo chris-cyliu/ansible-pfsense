@@ -111,7 +111,10 @@ class PFSenseOpenVpnModule(PFSenseModuleBase):
             obj["authmode"] = ','.join(params["authmode"])
             self._get_ansible_param(obj, "protocol")
             self._get_ansible_param(obj, "dev_mode")
-            obj["interface"] = self.pfsense.get_interface_by_display_name(params["if_descr"])
+            if params["if_descr"] != "any":
+                obj["interface"] = self.pfsense.get_interface_by_display_name(params["if_descr"])
+            else:
+                obj["interface"] = "any"
             self._get_ansible_param(obj, "ipaddr")
             self._get_ansible_param(obj, "local_port")
             self._get_ansible_param(obj, "descr", fname="description")
@@ -238,7 +241,7 @@ echo json_encode(array('vpnid'=>openvpn_vpnid_next()));
             if not authmode in self.get_auth_servers():
                 self.module.fail_json(msg=f'authmode, {authmode} is not a valid auth')
         
-        if not self.pfsense.is_interface_display_name(params["if_descr"]):
+        if params["if_descr"]!="any" and not self.pfsense.is_interface_display_name(params["if_descr"]):
             self.module.fail_json(msg=f'if_descr, {params["if_descr"]} is not a display name of interface')
 
         if not self.pfsense.is_ipv4_address(params["ipaddr"]) and params["ipaddr"]!='':
