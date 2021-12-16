@@ -14,7 +14,7 @@ OPENVPN_ARGUMENT_SPEC = dict(
     state=dict(default='present', choices=['present', 'absent']),
 
     mode=dict(default='server_user', options=['p2p_tls','p2p_shared_key', 'server_tls', 'server_user', 'server_tls_user']),
-    authmode=dict(required=True, type='str'),
+    authmode=dict(required=True, type='list', elements='str'),
     protocol=dict(default='UDP4', options=['UDP4', 'UDP6', 'TCP4', 'TCP6', 'UDP', 'TCP']),
     dev_mode=dict(default='tun', options=['tun', 'tap']),
     if_descr=dict(required=True, type='str'),
@@ -108,7 +108,7 @@ class PFSenseOpenVpnModule(PFSenseModuleBase):
 
         if params["state"] == "present":
             self._get_ansible_param(obj, "mode")
-            self._get_ansible_param(obj, "authmode")
+            obj["authmode"] = ','.join(params["authmode"])
             self._get_ansible_param(obj, "protocol")
             self._get_ansible_param(obj, "dev_mode")
             obj["interface"] = self.pfsense.get_interface_by_display_name(params["if_descr"])
@@ -234,8 +234,9 @@ echo json_encode(array('vpnid'=>openvpn_vpnid_next()));
         """ do some extra checks on input parameters """
         params = self.params
         
-        if not params["authmode"] in self.get_auth_servers():
-            self.module.fail_json(msg=f'authmode, {params["authmode"]} is not a valid auth')
+        for authmode in params["authmode"]:
+            if not authmode in self.get_auth_servers():
+                self.module.fail_json(msg=f'authmode, {authmode} is not a valid auth')
         
         if not self.pfsense.is_interface_display_name(params["if_descr"]):
             self.module.fail_json(msg=f'if_descr, {params["if_descr"]} is not a display name of interface')
