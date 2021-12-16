@@ -38,7 +38,7 @@ OPENVPN_ARGUMENT_SPEC = dict(
     tunnel_network=dict(required=True, type='str'),
     remote_network=dict(default='', type='str'),
     gwredir=dict(default=False, type='bool'),
-    local_network=dict(required=True, type='str'),
+    local_network=dict(required=True, type='list', elements='str'),
     maxclients=dict(default=0, type='int'), # 0 means no limit
     allow_compression=dict(default='no', choices=['yes', 'no', 'asym']),
     compression=dict(default='', choices=['','none','stub','stub-v2', 'lz4', 'lz4-v2', 'lzo', 'noadapt', 'adaptive', 'yes', 'no']),
@@ -132,7 +132,7 @@ class PFSenseOpenVpnModule(PFSenseModuleBase):
             self._get_ansible_param(obj, "tunnel_network")
             self._get_ansible_param(obj, "remote_network")
             self._get_ansible_param_bool(obj, "gwredir")
-            self._get_ansible_param(obj, "local_network")
+            obj["local_network"] = ','.join(params["local_network"])
             if not params["maxclients"]:
                 obj["maxclients"] = ''
             else:
@@ -265,8 +265,9 @@ echo json_encode(array('vpnid'=>openvpn_vpnid_next()));
         if not self.pfsense.is_ipv4_network(params["remote_network"]) and params["remote_network"]!='':
             self.module.fail_json(msg=f'remote_network, {params["remote_network"]} is not a valid ipv4 network')
         
-        if not self.pfsense.is_ipv4_network(params["local_network"]) and params["local_network"]!='':
-            self.module.fail_json(msg=f'local_network, {params["local_network"]} is not a valid ipv4 network')
+        for local_network in params["local_network"]:
+            if not self.pfsense.is_ipv4_network(local_network) and local_network!='':
+                self.module.fail_json(msg=f'local_network, {local_network} is not a valid ipv4 network')
         
         if self.get_netbios_ntype_key(params["netbios_ntype"]) is None:
             self.module.fail_json(msg=f'netbios_ntype, {params["netbios_ntype"]} is not a valid')
