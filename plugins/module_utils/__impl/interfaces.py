@@ -151,12 +151,14 @@ def get_ports(self):
             '$portlist = get_interface_list();'
             '$lagglist = get_lagg_interface_list();'
             '$portlist = array_merge($portlist, $lagglist);'
-            'foreach ($lagglist as $laggif => $lagg) {'
-            "    $laggmembers = explode(',', $lagg['members']);"
-            '    foreach ($laggmembers as $lagm)'
-            '        if (isset($portlist[$lagm]))'
-            '            unset($portlist[$lagm]);'
-            '}')
+            # 'foreach ($lagglist as $laggif => $lagg) {' 
+            # "    $laggmembers = explode(',', $lagg['members']);"
+            # '    foreach ($laggmembers as $lagm)'
+            # '        if (isset($portlist[$lagm]))'
+            # '            unset($portlist[$lagm]);'
+            # '}'
+            )
+
 
     if self.is_at_least_2_5_0():
         get_interface_cmd += (
