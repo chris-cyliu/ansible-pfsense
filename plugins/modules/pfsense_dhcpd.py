@@ -194,7 +194,7 @@ class PFSenseDHCPDModule(PFSenseModuleBase):
 
         self._validate_ip_range(params["ip_range"])
         
-        if params["gateway"] != '' and not self.pfsense.is_ipv4_address(params["gateway"]):
+        if params["gateway"] != '' and params["gateway"] != 'none' and not self.pfsense.is_ipv4_address(params["gateway"]):
             self.module.fail_json(msg=f'gateway, {params["gateway"]} is not a valid ipv4 address')
 
         for dnsserver in params["dnsserver"]:
