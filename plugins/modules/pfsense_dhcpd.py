@@ -81,6 +81,7 @@ DHCPD_ARGUMENT_SPEC = dict(
     numberoptions=dict(default='', type='str'),
     dnsserver=dict(default=[], type='list', elements='str'),
     staticmap=dict(default=[], type='list', elements='dict', options=DHCPD_STATICMAP_SPEC),
+    netboot=dict(default=False, type='bool')
 )
 
 DHCPD_REQUIRED_IF = []
@@ -175,7 +176,8 @@ class PFSenseDHCPDModule(PFSenseModuleBase):
             self._get_ansible_param(obj, "numberoptions")
             self._get_ansible_param(obj, "dnsserver")
             obj["staticmap"] = [self._staticmap_to_obj(staticmap) for staticmap in params["staticmap"]]
-
+            if(params["netboot"]):
+                obj["netboot"]=""
         return obj
 
     def _validate_ip_range(self, params):
