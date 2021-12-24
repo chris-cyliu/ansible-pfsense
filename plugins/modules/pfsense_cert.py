@@ -55,7 +55,7 @@ class PFSenseCertModule(PFSenseModuleBase):
                 self.module.fail_json(msg='Could not recognize cert format: %s' % (cert))
             prv = params['prv']
             lines = prv.splitlines()
-            if not(lines[0] == '-----BEGIN PRIVATE KEY-----' and lines[-1] == '-----END PRIVATE KEY-----') or not(lines[0] == '-----BEGIN RSA PRIVATE KEY-----' and lines[-1] == '-----END RSA PRIVATE KEY-----'):
+            if not(lines[0] == '-----BEGIN PRIVATE KEY-----' and lines[-1] == '-----END PRIVATE KEY-----') and not(lines[0] == '-----BEGIN RSA PRIVATE KEY-----' and lines[-1] == '-----END RSA PRIVATE KEY-----'):
                 self.module.fail_json(msg='Could not recognize private key format: %s' % (prv))
             
             if self.params["ca_descr"] and not self.pfsense.find_ca_elt(self.params["ca_descr"]):
