@@ -76,6 +76,7 @@ OPENVPN_ARGUMENT_SPEC = dict(
     dns_server2=dict(default='', type='str'),
     dns_server3=dict(default='', type='str'),
     dns_server4=dict(default='', type='str'),
+    duplicate_cn=dict(default=False, type='bool')
 )
 
 
@@ -182,7 +183,7 @@ class PFSenseOpenVpnModule(PFSenseModuleBase):
             self._get_ansible_param(obj, "dns_server2")
             self._get_ansible_param(obj, "dns_server3")
             self._get_ansible_param(obj, "dns_server4")
-
+            self._get_ansible_param_bool(obj, "duplicate_cn")
         else:
             obj["disable"] = ""
         return obj
