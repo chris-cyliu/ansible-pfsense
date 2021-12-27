@@ -101,6 +101,8 @@ class PFSenseDHCPDModule(PFSenseModuleBase):
     def __init__(self, module, pfsense=None):
         super(PFSenseDHCPDModule, self).__init__(module, pfsense)
         self.name = "pfsense_dhcpd"
+
+        self.root_elt = self.pfsense.get_element('dhcpd')
     
     def _range_params_to_obj(self, params):
         obj = dict()
@@ -214,7 +216,7 @@ class PFSenseDHCPDModule(PFSenseModuleBase):
 
     def _find_target(self):
         """ find the XML target_elt """
-        dhcpd_xml_element = self.pfsense.get_element('dhcpd')
+        dhcpd_xml_element = self.root_elt
         if not dhcpd_xml_element:
             dhcpd_xml_element = self.pfsense.new_element('dhcpd')
             self.pfsense.root.append(dhcpd_xml_element)
@@ -232,10 +234,7 @@ class PFSenseDHCPDModule(PFSenseModuleBase):
 
     def _get_params_to_remove(self):
         """ returns the list of params to remove if they are not set """
-        if self.params["state"] == "absent":
-            return ["enable"]
-        else:
-            return []
+        return []
 
     ##############################
     # run
