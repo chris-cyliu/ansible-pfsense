@@ -63,8 +63,9 @@ class PFSenseHaproxyFrontendModule(PFSenseModuleBase):
 
         ret['extaddr'] = 'custom'
         ret['extaddr_custom'] = addropt['addr']
-        ret['extaddr_port'] = addropt['port']
-        ret['extaddr_ssl'] = 'yes' if addropt['ssl'] else 'no'
+        ret['extaddr_port'] = str(addropt['port'])
+        if addropt['ssl']:
+            ret['extaddr_ssl'] = 'yes'
         ret['_index'] = ''
 
         return ret
@@ -79,12 +80,14 @@ class PFSenseHaproxyFrontendModule(PFSenseModuleBase):
             self._get_ansible_param(obj, 'descr', fname='desc')
             self._get_ansible_param(obj, 'type')
             self._get_ansible_param(obj, 'httpclose')
-            obj["ssloffloadcert"] = self.pfsense.find_cert_elt(params["cert_descr"]).find("refid").text
+            if params["cert_descr"]: 
+                obj["ssloffloadcert"] = self.pfsense.find_cert_elt(params["cert_descr"]).find("refid").text
             self._get_ansible_param(obj, 'backend_serverpool')
-            self._get_ansible_param(obj, 'forwardfor')
+            self._get_ansible_param_bool(obj, 'forwardfor')
             obj['a_extaddr'] = {
                 'item': [self._addr_params_to_obj(x) for x in params['addrs']]
             }
+            obj["status"] = "active"
         return obj
 
     def _validate_params(self):
@@ -93,13 +96,13 @@ class PFSenseHaproxyFrontendModule(PFSenseModuleBase):
         if re.search(r'[^a-zA-Z0-9\.\-_]', self.params['name']) is not None:
             self.module.fail_json(msg="The field 'name' contains invalid characters.")
         
-        if not self.pfsense.find_cert_elt(self.params["cert_descr"]):
-            self.module.fail_json(msg=f'cert_descr, {self.paramsg["cert_descr"]} is not a valid descr of CA')
+        if self.params["cert_descr"] and not self.pfsense.find_cert_elt(self.params["cert_descr"]):
+            self.module.fail_json(msg=f'cert_descr, {self.param["cert_descr"]} is not a valid descr of CA')
 
         for addropt in self.params['addrs']:
             if not self.pfsense.is_ipv4_address(addropt['addr']):
                 self.module.fail_json(msg=f'{addropt["addr"]} is not a valid IPv4 address')
-            
+    
     ##############################
     # XML processing
     #
