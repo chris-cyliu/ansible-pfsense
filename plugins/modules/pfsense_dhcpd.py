@@ -8,6 +8,7 @@
 
 from __future__ import absolute_import, division, print_function
 import copy
+import re
 __metaclass__ = type
 from ansible_collections.pfsensible.core.plugins.module_utils.module_base import PFSenseModuleBase
 from ansible.module_utils.basic import AnsibleModule
@@ -191,6 +192,8 @@ class PFSenseDHCPDModule(PFSenseModuleBase):
     def _validate_staticmap(self, params):
         if not self.pfsense.is_ipv4_address(params["ipaddr"]):
             self.module.fail_json(msg=f'ipaddr, {params["ipaddr"]} is not a valid ipv4 address')
+        if params.get('mac') and re.match('^([0-9A-F]{2}[:-]){5}([0-9A-F]{2})$', params['mac'], flags=re.IGNORECASE) is None:
+            self.module.fail_json(msg=f'MAC address, {params.get("mac")} , must be in the following format: xx:xx:xx:xx:xx:xx (or blank).')
 
     def _validate_params(self):
         """ do some extra checks on input parameters """
@@ -234,7 +237,7 @@ class PFSenseDHCPDModule(PFSenseModuleBase):
 
     def _get_params_to_remove(self):
         """ returns the list of params to remove if they are not set """
-        return []
+        return ['netboot']
 
     ##############################
     # run
