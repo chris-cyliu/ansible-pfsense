@@ -595,6 +595,7 @@ class PFSenseModule(object):
         cmd += command
         cmd += '\n?>\n'
         (dummy, stdout, stderr) = self.module.run_command('/usr/local/bin/php', data=cmd)
+        print(f"DEBUG php command execution:\n {cmd}")
         # TODO: check stderr for errors
         return json.loads(stdout)
 
@@ -651,7 +652,7 @@ class PFSenseModule(object):
                 self.module.fail_json(msg="Unable to get version from pfSense (got '{0}')".format(pfsense_version))
             for idx in range(0, match.lastindex):
                 self.pfsense_version.append(int(match.group(idx + 1)))
-
+        
         # we must compare a CE with a CE or pfSense+ with pfSense+
         is_ce_in = self.is_ce_version(version)
         is_ce = self.is_ce_version(self.pfsense_version)
@@ -660,6 +661,9 @@ class PFSenseModule(object):
 
         for idx, ver in enumerate(version):
             if idx == len(self.pfsense_version):
+                return True
+            
+            if self.pfsense_version[idx] > ver and or_more:
                 return True
 
             if ver < self.pfsense_version[idx] and not or_more or ver > self.pfsense_version[idx]:
